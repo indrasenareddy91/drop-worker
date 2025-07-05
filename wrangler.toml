@@ -6,7 +6,7 @@ node_compat = true
 
 [vars]
 
-database=postgresql://neondb_owner:npg_iycjf5qhb8Me@ep-nameless-shadow-a8czemhb-pooler.eastus2.azure.neon.tech/neondb?sslmode=require&channel_binding=require
+database='postgresql://neondb_owner:npg_iycjf5qhb8Me@ep-nameless-shadow-a8czemhb-pooler.eastus2.azure.neon.tech/neondb?sslmode=require&channel_binding=require'
 
 
 [triggers]
