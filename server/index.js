@@ -4,7 +4,7 @@ import { neon } from '@neondatabase/serverless';
 const router = AutoRouter();
 
 // Database connection (using Neon PostgreSQL as example)
-const getDb = (env) => neon(env.DATABASE);
+const getDb = (env) => neon(env.database);
 
 // CORS headers for browser requests
 const corsHeaders = {
