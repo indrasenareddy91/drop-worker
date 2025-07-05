@@ -1,5 +1,5 @@
 #:schema node_modules/wrangler/config-schema.json
-name = "workerbot"
+name = "dropp"
 main = "server/index.js"
 compatibility_date = "2024-09-23"
 nodejs_compat = true
