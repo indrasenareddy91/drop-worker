@@ -1,5 +1,6 @@
 import { AutoRouter } from 'itty-router';
 import { neon } from '@neondatabase/serverless';
+import * as cheerio from 'cheerio';
 
 const router = AutoRouter();
 
@@ -175,15 +176,11 @@ router.get('/', () => {
 });
 
 // Main scraping function
+
 async function scrapeFlixPatrol() {
   const response = await fetch('https://flixpatrol.com/popular/', {
     headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-      'Accept-Language': 'en-US,en;q=0.5',
-      'Accept-Encoding': 'gzip, deflate, br',
-      'Connection': 'keep-alive',
-      'Upgrade-Insecure-Requests': '1',
+      'User-Agent': 'Mozilla/5.0',
     }
   });
 
@@ -192,8 +189,54 @@ async function scrapeFlixPatrol() {
   }
 
   const html = await response.text();
-  return parseMovieData(html);
+  const $ = cheerio.load(html);
+
+  const movies = [];
+  console.log(html)
+
+  $('tr.table-group').each((i, row) => {
+    try {
+      const movie = {};
+
+      const title = $(row).find('img[alt]').attr('alt') || null;
+      const posterSrc = $(row).find('img').attr('src') || '';
+      const posterUrl = posterSrc ? `https://flixpatrol.com${posterSrc}` : null;
+      const linkHref = $(row).find('a').attr('href') || '';
+      const link = linkHref ? `https://flixpatrol.com${linkHref}` : null;
+
+const premiereSpan = $(row).find('span[title="Premiere"]');
+const fullDateText = premiereSpan.text().trim(); // "06/04/2025"
+const year = fullDateText.split('/')[2] || null;
+      const allSpans = $(row).find('span');
+      const country = $(allSpans[2]).text().trim() || null;
+      const genre = $(allSpans[4]).text().trim() || null;
+
+      const rowText = $(row).text();
+      console.log(rowText)
+      const hasStreaming = /Netflix|Amazon|Disney|HBO|Hulu|Apple TV|streaming|Stream/i.test(rowText);
+      const isMovie = rowText.includes('Movie');
+
+      if (title && isMovie) {
+        movie.title = title;
+        movie.posterUrl = posterUrl;
+        movie.link = link;
+        movie.year = year;
+        movie.country = country;
+        movie.genre = genre;
+        movie.hasStreaming = hasStreaming;
+        movie.isMovie = true;
+
+        movies.push(movie);
+      }
+
+    } catch (error) {
+      console.log('Error parsing row:', error);
+    }
+  });
+   console.log(movies)
+  return movies;
 }
+
 
 // Parse movie data from HTML
 function parseMovieData(html) {
@@ -300,7 +343,7 @@ async function handleScheduled(event, env) {
   
   try {
     // Create a fake request to trigger the scheduled endpoint
-    const request = new Request('https://worker.example.com/scheduled');
+    const request = new Request('https://workerbot.reddyindra53.workers.dev/scheduled');
     const response = await router.fetch(request, env);
     
     console.log('Cron job completed successfully');
