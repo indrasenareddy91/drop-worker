@@ -2,7 +2,7 @@
 name = "workerbot"
 main = "server/index.js"
 compatibility_date = "2024-09-23"
-node_compat = true
+nodejs_compat = true
 
 [vars]
 
