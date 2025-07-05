@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@supabase/supabase-js": "^2.50.3",
+    "itty-router": "^5.0.18"
+  }
+}
